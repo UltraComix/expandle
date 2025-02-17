@@ -159,23 +159,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update keyboard
                 const key = keyboard.querySelector(`button[data-key="${result.letter.toUpperCase()}"]`);
                 if (key) {
-                    // Remove all status classes but keep the base 'key' class
-                    key.className = 'key';
+                    // Get the current status of the key
+                    const currentStatus = key.classList.contains('correct') ? 'correct' :
+                                       key.classList.contains('wrong-position') ? 'wrong-position' :
+                                       key.classList.contains('wrong') ? 'wrong' : null;
                     
-                    // Add the new status class
-                    if (result.status === 'correct') {
-                        key.classList.add('correct');
-                    } else if (result.status === 'wrong-position' && !key.classList.contains('correct')) {
-                        key.classList.add('wrong-position');
-                    } else if (result.status === 'wrong' && 
-                             !key.classList.contains('correct') && 
-                             !key.classList.contains('wrong-position')) {
-                        key.classList.add('wrong');
-                    }
+                    // Only update if the new status is better than the current one
+                    // Priority: correct > wrong-position > wrong
+                    const shouldUpdate = 
+                        !currentStatus || // No current status
+                        (currentStatus === 'wrong' && (result.status === 'correct' || result.status === 'wrong-position')) || // Upgrade from wrong
+                        (currentStatus === 'wrong-position' && result.status === 'correct'); // Upgrade to correct
                     
-                    // Keep the key-special class if it's a special key
-                    if (key.dataset.key === 'ENTER' || key.dataset.key === 'DEL') {
-                        key.classList.add('key-special');
+                    if (shouldUpdate) {
+                        // Remove all status classes but keep the base 'key' class
+                        key.className = 'key';
+                        
+                        // Add the new status class
+                        key.classList.add(result.status);
+                        
+                        // Keep the key-special class if it's a special key
+                        if (key.dataset.key === 'ENTER' || key.dataset.key === 'DEL') {
+                            key.classList.add('key-special');
+                        }
                     }
                 }
             });

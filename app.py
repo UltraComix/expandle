@@ -49,7 +49,7 @@ class GameState:
     
     def check_guess(self, guess):
         print(f"Checking guess '{guess}' against word '{self.current_word}'")
-        if len(guess) != len(self.current_word):  
+        if len(guess) != len(self.current_word):
             print(f"Length mismatch: guess={len(guess)}, expected={len(self.current_word)}")
             return None
         
@@ -62,6 +62,14 @@ class GameState:
         word_chars = list(self.current_word.lower())
         guess_chars = list(guess.lower())
         
+        # Count occurrences of each letter in the target word
+        word_letter_count = {}
+        for letter in word_chars:
+            word_letter_count[letter] = word_letter_count.get(letter, 0) + 1
+        
+        # Track how many of each letter we've marked as correct
+        correct_letter_count = {}
+        
         if is_correct:
             # If the guess is correct, mark all letters as correct
             result = [{"letter": c, "status": "correct"} for c in guess_chars]
@@ -72,28 +80,27 @@ class GameState:
             print(f"Added {points} points for solving in {self.attempts} attempts")
         else:
             # First pass: Check for exact matches
-            for i in range(len(guess)):  
-                if guess_chars[i] == word_chars[i]:
-                    result.append({"letter": guess_chars[i], "status": "correct"})
-                else:
-                    result.append({"letter": guess_chars[i], "status": "wrong"})
+            result = [{"letter": c, "status": "wrong"} for c in guess_chars]
             
-            # Second pass: Check for letters in wrong position
-            remaining_chars = word_chars.copy()
-            for i, char in enumerate(guess_chars):
-                if result[i]["status"] == "correct":
-                    if char in remaining_chars:  
-                        remaining_chars.remove(char)
+            # Mark correct positions first
+            for i, (guess_char, word_char) in enumerate(zip(guess_chars, word_chars)):
+                if guess_char == word_char:
+                    result[i]["status"] = "correct"
+                    correct_letter_count[guess_char] = correct_letter_count.get(guess_char, 0) + 1
             
-            for i, char in enumerate(guess_chars):
-                if result[i]["status"] == "wrong" and char in remaining_chars:
-                    result[i]["status"] = "wrong-position"
-                    remaining_chars.remove(char)
+            # Second pass: Check for wrong positions
+            # Only mark as wrong-position if we haven't exceeded the count of that letter in the word
+            for i, guess_char in enumerate(guess_chars):
+                if result[i]["status"] == "wrong":  # Skip already correct ones
+                    correct_count = correct_letter_count.get(guess_char, 0)
+                    wrong_pos_allowed = word_letter_count.get(guess_char, 0) - correct_count
+                    
+                    if wrong_pos_allowed > 0 and guess_char in word_chars:
+                        result[i]["status"] = "wrong-position"
+                        correct_letter_count[guess_char] = correct_letter_count.get(guess_char, 0) + 1
         
-        print(f"Result statuses: {[r['status'] for r in result]}")
-        
-        # Store feedback history for hint selection
-        self.feedback_history[self.attempts] = [item["status"] for item in result]
+        # Store feedback for hint system
+        self.feedback_history[self.attempts] = [r["status"] for r in result]
         
         return {
             "result": result,
@@ -111,38 +118,43 @@ class GameState:
             print("Not enough points for hint")
             return None
         
-        # Get all discovered letters (both correct and wrong-position)
-        discovered_letters = set()
-        correct_positions = {}  # Track correct positions
+        # Count occurrences of each letter in the target word
+        word_letter_count = {}
+        for letter in self.current_word.lower():
+            word_letter_count[letter] = word_letter_count.get(letter, 0) + 1
+        
+        print(f"Letter counts in word: {word_letter_count}")
+        
+        # Track discovered letters and their counts
+        discovered_letter_count = {}
         
         # Go through all previous guesses
         for attempt_num, feedback in self.feedback_history.items():
             for i, status in enumerate(feedback):
-                if status == "correct":
-                    # For correct letters, store their position
-                    discovered_letters.add(self.current_word[i].lower())
-                    correct_positions[i] = self.current_word[i].lower()
-                elif status == "wrong-position":
-                    discovered_letters.add(self.current_word[i].lower())
+                letter = self.current_word[i].lower()
+                if status in ["correct", "wrong-position"]:
+                    discovered_letter_count[letter] = discovered_letter_count.get(letter, 0) + 1
         
-        print(f"Already discovered letters: {discovered_letters}")
-        print(f"Correct positions: {correct_positions}")
+        print(f"Discovered letter counts: {discovered_letter_count}")
         
-        # Find letters that haven't been discovered yet
-        undiscovered_letters = []
-        for i, letter in enumerate(self.current_word.lower()):
-            # Only add if letter hasn't been discovered and isn't correctly placed
-            if letter not in discovered_letters and i not in correct_positions:
-                undiscovered_letters.append(letter)
+        # Find letters that haven't been fully discovered yet
+        available_letters = []
+        for letter, target_count in word_letter_count.items():
+            discovered_count = discovered_letter_count.get(letter, 0)
+            remaining_count = target_count - discovered_count
+            
+            if remaining_count > 0:
+                # Add the letter as many times as it's still undiscovered
+                available_letters.extend([letter] * remaining_count)
         
-        print(f"Available undiscovered letters: {undiscovered_letters}")
+        print(f"Available letters for hint: {available_letters}")
         
-        if not undiscovered_letters:
+        if not available_letters:
             print("No new letters to hint")
             return None
             
         # Choose a random undiscovered letter
-        hint_letter = random.choice(undiscovered_letters)
+        hint_letter = random.choice(available_letters)
         self.hint_used = True
         self.total_score -= 1
         
