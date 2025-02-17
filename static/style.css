@@ -1,0 +1,301 @@
+:root {
+    --correct-color: #800080;        /* Purple */
+    --wrong-position-color: #ff0000; /* Red */
+    --wrong-color: #808080;          /* Gray */
+    --background-color: #f0f2f5;
+    --primary-color: #ff0000;
+    --keyboard-bg: #d3d6da;
+    --border-color: #d3d6da;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+#gameBoard {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+    gap: 5px;
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--border-color);
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.cell.correct {
+    background-color: var(--correct-color);
+    border-color: var(--correct-color);
+    color: white;
+    animation: correctCell 0.5s ease;
+}
+
+.cell.wrong-position {
+    background-color: var(--wrong-position-color);
+    border-color: var(--wrong-position-color);
+    color: white;
+}
+
+.cell.wrong {
+    background-color: var(--wrong-color);
+    border-color: var(--wrong-color);
+    color: white;
+}
+
+@keyframes correctCell {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.input-section {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#guessInput {
+    padding: 10px;
+    font-size: 1.2em;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    text-transform: uppercase;
+    width: 150px;
+}
+
+#submitGuess {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#submitGuess:hover {
+    background-color: #cc0000;
+}
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 5px;
+}
+
+.keyboard .key {
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 4px;
+    color: black;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 2px;
+    min-width: 30px;
+    padding: 10px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.keyboard .key:hover {
+    background-color: #d0d0d0;
+}
+
+.keyboard .key.correct {
+    background-color: var(--correct-color) !important;
+    color: white !important;
+    border-color: var(--correct-color) !important;
+}
+
+.keyboard .key.wrong-position {
+    background-color: var(--wrong-position-color) !important;
+    color: white !important;
+    border-color: var(--wrong-position-color) !important;
+}
+
+.keyboard .key.wrong {
+    background-color: var(--wrong-color) !important;
+    color: white !important;
+    border-color: var(--wrong-color) !important;
+}
+
+.keyboard .key:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.keyboard .key.key-special {
+    min-width: 65px !important;
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+.keyboard .key.key-special:hover {
+    background-color: #c0392b !important;
+}
+
+.message {
+    text-align: center;
+    margin: 10px 0;
+    border-radius: 5px;
+    padding: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.message.success {
+    background-color: var(--correct-color);
+    color: white;
+}
+
+.message.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.message .correct-word {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.hint-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #ffd700;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hint-button:hover {
+    transform: scale(1.1);
+    color: #ffb700;
+}
+
+.hint-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hint-button i {
+    transition: all 0.3s ease;
+}
+
+.hint-button:hover i {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.progress-staircase {
+    margin-top: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-staircase h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.staircase {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stair {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: var(--background-color);
+    border-radius: 5px;
+    margin-left: calc(var(--level) * 20px);
+    transition: all 0.3s ease;
+}
+
+.stair .word {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--correct-color);
+}
+
+.stair .attempts {
+    margin-left: auto;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.stair:hover {
+    transform: translateX(5px);
+    background: #e8e8e8;
+}
