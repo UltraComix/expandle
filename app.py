@@ -1,8 +1,11 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, make_response
 from datetime import datetime
 import random
+import os
+import json
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Generate a random secret key
 
 # Word lists for different levels using common, everyday words
 WORD_LISTS = {
@@ -17,8 +20,37 @@ WORD_LISTS = {
 
 class GameState:
     def __init__(self):
-        self.reset_game()
-        
+        # Try to get state from cookie
+        state_cookie = request.cookies.get('game_state')
+        if state_cookie:
+            try:
+                state = json.loads(state_cookie)
+                self.current_level = state['current_level']
+                self.current_word = state['current_word']
+                self.attempts = state['attempts']
+                self.total_score = state['total_score']
+                self.completed_words = state['completed_words']
+                self.hint_used = state['hint_used']
+                self.feedback_history = state['feedback_history']
+                print(f"Loaded from cookie - level: {self.current_level}, word: {self.current_word}, attempts: {self.attempts}")
+            except:
+                print("Error loading cookie, starting new game")
+                self.reset_game()
+        else:
+            print("No cookie found, starting new game")
+            self.reset_game()
+
+    def to_dict(self):
+        return {
+            'current_level': self.current_level,
+            'current_word': self.current_word,
+            'attempts': self.attempts,
+            'total_score': self.total_score,
+            'completed_words': self.completed_words,
+            'hint_used': self.hint_used,
+            'feedback_history': self.feedback_history
+        }
+
     def reset_game(self):
         self.current_level = 3  # Start with 3-letter words
         self.current_word = self._get_new_word()
@@ -28,7 +60,19 @@ class GameState:
         self.hint_used = False  # Track if hint was used for current level
         self.feedback_history = {}  # Store feedback history for hint selection
         print(f"Game reset to level {self.current_level}, word: {self.current_word}")
-        
+
+    def save_to_session(self):
+        """Save current state to session"""
+        print(f"Saving to session - level: {self.current_level}, word: {self.current_word}, attempts: {self.attempts}")
+        session['current_level'] = self.current_level
+        session['current_word'] = self.current_word
+        session['attempts'] = self.attempts
+        session['total_score'] = self.total_score
+        session['completed_words'] = self.completed_words
+        session['hint_used'] = self.hint_used
+        session['feedback_history'] = self.feedback_history
+        print("Session after save:", dict(session))
+
     def get_points_for_attempt(self, attempt_number):
         points_map = {
             1: 10,
@@ -48,15 +92,15 @@ class GameState:
         return word
     
     def check_guess(self, guess):
-        print(f"Checking guess '{guess}' against word '{self.current_word}'")
+        print(f"Checking guess '{guess}' against word '{self.current_word}' (attempts: {self.attempts})")
         if len(guess) != len(self.current_word):
             print(f"Length mismatch: guess={len(guess)}, expected={len(self.current_word)}")
             return None
         
         self.attempts += 1
+        print(f"Attempts now: {self.attempts}")
         result = []
         is_correct = guess.lower() == self.current_word.lower()
-        print(f"Is correct: {is_correct}")
         
         # Convert strings to lists for easier manipulation
         word_chars = list(self.current_word.lower())
@@ -102,11 +146,10 @@ class GameState:
         # Store feedback for hint system
         self.feedback_history[self.attempts] = [r["status"] for r in result]
         
-        return {
-            "result": result,
-            "is_correct": is_correct,
-            "attempts": self.attempts
-        }
+        # Save state after updating
+        # self.save_to_session()
+        print(f"Returning result for guess '{guess}': {result}")
+        return {"result": result, "is_correct": is_correct, "attempts": self.attempts}
 
     def get_hint(self):
         print(f"Getting hint. Hint used this level: {self.hint_used}, Total score: {self.total_score}")
@@ -157,7 +200,7 @@ class GameState:
         hint_letter = random.choice(available_letters)
         self.hint_used = True
         self.total_score -= 1
-        
+        # self.save_to_session()
         print(f"Providing hint letter: {hint_letter}")
         return hint_letter
 
@@ -169,25 +212,30 @@ class GameState:
             self.attempts = 0  # Reset attempts for new level
             self.hint_used = False  # Reset hint status
             self.feedback_history = {}  # Reset feedback history
+            # self.save_to_session()
             print(f"Moving to level {self.current_level}, new word: {self.current_word}")
             return True
         return False
-
-game_state = GameState()
 
 MAX_ATTEMPTS = 8
 
 @app.route('/')
 def home():
     # Reset game state when home page is loaded
-    global game_state
+    game_state = GameState()
     game_state.reset_game()
-    return render_template('index.html')
+    response = make_response(render_template('index.html'))
+    response.set_cookie('game_state', json.dumps(game_state.to_dict()))
+    return response
 
 @app.route('/api/guess', methods=['POST'])
 def guess():
+    game_state = GameState()  # This will load from cookie
+    print(f"Current game state - level: {game_state.current_level}, attempts: {game_state.attempts}, word: {game_state.current_word}")
+
     data = request.get_json()
     guess = data.get('guess', '').lower()
+    print(f"Received guess: {guess}")
     
     if not guess:
         return jsonify({"error": "No guess provided"}), 400
@@ -200,7 +248,9 @@ def guess():
         "result": result["result"],
         "is_correct": result["is_correct"],
         "attempts": result["attempts"],
-        "total_score": game_state.total_score
+        "total_score": game_state.total_score,
+        "current_level": game_state.current_level,  # Always include current level
+        "current_word_length": len(game_state.current_word)  # Add word length
     }
     
     if result["is_correct"]:
@@ -210,6 +260,7 @@ def guess():
             "level": len(game_state.current_word),  
             "attempts": game_state.attempts
         })
+        # game_state.save_to_session()
         
         # Move to next level
         next_level = game_state.next_level()
@@ -223,12 +274,16 @@ def guess():
     elif game_state.attempts >= MAX_ATTEMPTS:
         response["game_over"] = True
         response["word"] = game_state.current_word
-        
-    print(f"Sending response for guess '{guess}': {response}")
-    return jsonify(response)
+    
+    # Create response with cookie
+    resp = make_response(jsonify(response))
+    resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
+    return resp
 
 @app.route('/api/hint', methods=['POST'])
 def get_hint():
+    game_state = GameState()  # This will load from cookie
+
     if game_state.hint_used:
         return jsonify({"error": "Hint already used for this level"}), 400
         
@@ -241,8 +296,11 @@ def get_hint():
             "letter": hint,
             "total_score": game_state.total_score
         }
-        print(f"Sending hint response: {response}")
-        return jsonify(response)
+        # Create response with cookie
+        resp = make_response(jsonify(response))
+        resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
+        return resp
+        
     return jsonify({"error": "No hint available"}), 400
 
 if __name__ == '__main__':

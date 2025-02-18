@@ -142,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
             totalScoreSpan.textContent = data.total_score;
             attemptsSpan.textContent = data.attempts;
             
+            // Update current level if it changed
+            if (data.current_level && data.current_level !== currentLevel) {
+                currentLevel = data.current_level;
+            }
+            
             // Get current row and update cells
             const currentRow = gameBoard.children[data.attempts - 1];
             if (!currentRow) {
@@ -197,10 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateStaircase(data.completed_words);
                 }
                 
-                // Wait longer to show the completed word and ensure proper transition
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
                 if (data.current_level) {
+                    // Wait for animation and message to complete before changing level
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                     currentLevel = data.current_level;
                     showMessage(`Moving to ${currentLevel}-letter words...`);
                     // Wait for message to show before resetting board
