@@ -5,7 +5,7 @@
     --background-color: #f0f2f5;
     --primary-color: #ff0000;
     --keyboard-bg: #d3d6da;
-    --border-color: #d3d6da;
+    --border-color: #000000;         /* Changed to black */
 }
 
 * {
@@ -21,44 +21,65 @@ body {
 .container {
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;  /* More compact */
 }
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
+    background-color: var(--correct-color);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    font-size: 2.5em;
+    font-size: 2.8em;
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .game-info {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.game-info p {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 0 10px;
+}
+
+.game-info span {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffd700;
 }
 
 #gameBoard {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin-bottom: 20px;
+    gap: 3px;  
+    margin-bottom: 10px;  
     align-items: center;
 }
 
 .row {
     display: flex;
-    gap: 5px;
+    gap: 3px;  
 }
 
 .cell {
     width: 50px;
     height: 50px;
     border: 2px solid var(--border-color);
-    margin: 5px;
+    margin: 3px;  
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,9 +116,9 @@ h1 {
 
 .input-section {
     display: flex;
-    gap: 10px;
+    gap: 5px;  
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;  
 }
 
 #guessInput {
@@ -125,16 +146,16 @@ h1 {
 }
 
 .keyboard {
+    margin-top: 5px;  
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 3px;  
     align-items: center;
-    margin-top: 20px;
 }
 
 .keyboard-row {
     display: flex;
-    gap: 5px;
+    gap: 3px;  
 }
 
 .keyboard .key {
