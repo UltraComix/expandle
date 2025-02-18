@@ -163,13 +163,13 @@ class GameState:
 
     def next_level(self):
         """Move to the next level and reset game state for the new level."""
-        if self.current_level < 9:  
+        if self.current_level < 9:  # Max word length is 9
             self.current_level += 1
-            self.attempts = 0
-            self.hint_used = False  # Reset hint usage for new level
-            self.feedback_history = {}
             self.current_word = self._get_new_word()
-            print(f"Moving to level {self.current_level} with word {self.current_word}, hint_used reset to {self.hint_used}")
+            self.attempts = 0  # Reset attempts for new level
+            self.hint_used = False  # Reset hint status
+            self.feedback_history = {}  # Reset feedback history
+            print(f"Moving to level {self.current_level}, new word: {self.current_word}")
             return True
         return False
 

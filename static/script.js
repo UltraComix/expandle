@@ -197,13 +197,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateStaircase(data.completed_words);
                 }
                 
-                // Wait a moment to show the completed word
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Wait longer to show the completed word and ensure proper transition
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 if (data.current_level) {
                     currentLevel = data.current_level;
                     showMessage(`Moving to ${currentLevel}-letter words...`);
+                    // Wait for message to show before resetting board
+                    await new Promise(resolve => setTimeout(resolve, 500));
                     createGameBoard();
+                    // Clear keyboard colors for new level
+                    const keys = keyboard.querySelectorAll('.key');
+                    keys.forEach(key => {
+                        key.className = 'key';
+                        if (key.dataset.key === 'ENTER' || key.dataset.key === 'DEL') {
+                            key.classList.add('key-special');
+                        }
+                    });
                 } else {
                     showMessage('Congratulations! You\'ve completed all levels!');
                     // Update progress staircase one final time
