@@ -9,10 +9,18 @@ app.secret_key = os.urandom(24)  # Generate a random secret key
 
 # Word lists for different levels using common, everyday words
 WORD_LISTS = {
-    3: ["cat", "dog", "sun", "hat", "run", "box", "car", "day", "fun", "map"],
-    4: ["time", "home", "book", "game", "food", "rain", "play", "door", "tree", "star"],
-    5: ["happy", "house", "water", "music", "light", "green", "beach", "smile", "dream", "pizza"],
-    6: ["family", "garden", "school", "friend", "coffee", "sunset", "summer", "window", "purple", "orange"],
+    3: ["cat", "dog", "sun", "hat", "run", "box", "car", "day", "fun", "map", 
+        "bag", "cup", "pen", "bus", "leg", "sky", "toy", "bed", "key", "egg",
+        "pig", "red", "big", "top", "dad", "mom", "wet", "hot", "sad", "joy"],
+    4: ["time", "home", "book", "game", "food", "rain", "play", "door", "tree", "star",
+        "ball", "fish", "bird", "cake", "milk", "jump", "desk", "hand", "moon", "bear",
+        "bike", "park", "song", "leaf", "snow", "baby", "duck", "gift", "love", "wind"],
+    5: ["happy", "house", "water", "music", "light", "green", "beach", "smile", "dream", "pizza",
+        "dance", "cloud", "phone", "chair", "sleep", "bread", "paper", "heart", "grass", "train",
+        "apple", "river", "ocean", "tiger", "horse", "candy", "plant", "mouse", "earth", "clock"],
+    6: ["family", "garden", "school", "friend", "coffee", "sunset", "summer", "window", "purple", "orange",
+        "monkey", "pencil", "flower", "butter", "cookie", "rabbit", "bridge", "camera", "forest", "planet",
+        "winter", "spring", "autumn", "turtle", "dragon", "soccer", "basket", "doctor", "silver", "yellow"],
     7: ["holiday", "morning", "evening", "weekend", "rainbow", "chicken", "freedom", "dolphin", "penguin", "sunrise"],
     8: ["birthday", "sunshine", "computer", "baseball", "chocolate", "elephant", "universe", "mountain", "treasure", "butterfly"],
     9: ["adventure", "education", "beautiful", "happiness", "discovery", "wonderful", "beginning", "celebrate", "different", "knowledge"]
