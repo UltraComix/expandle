@@ -282,6 +282,7 @@ def guess():
     elif game_state.attempts >= MAX_ATTEMPTS:
         response["game_over"] = True
         response["word"] = game_state.current_word
+        response["completed_words"] = game_state.completed_words  # Add completed words when game is lost
     
     # Create response with cookie
     resp = make_response(jsonify(response))

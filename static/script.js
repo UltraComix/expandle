@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalScoreSpan = document.getElementById('totalScore');
     const currentLevelSpan = document.getElementById('currentLevel');
     const attemptsSpan = document.getElementById('attempts');
+    const gameOverModal = document.getElementById('gameOverModal');
+    const closeModalBtn = document.querySelector('.close');
+    const gameOverTitle = document.getElementById('gameOverTitle');
+    const gameOverScore = document.getElementById('gameOverScore');
+    const gameOverStaircase = document.getElementById('gameOverStaircase');
+    const staircase = document.querySelector('.staircase');
     
     const keyboardLayout = [
         ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -92,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateStaircase(completedWords) {
-        const staircase = document.querySelector('.staircase');
         staircase.innerHTML = '';
         
         completedWords.forEach(word => {
@@ -229,7 +234,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     hintButton.disabled = true;
                 }
             } else if (data.game_over) {
-                showMessage(`Game Over! The word was: ${data.word}. Final Score: ${data.total_score}`);
+                // Update game over modal content
+                gameOverTitle.textContent = `Game Over! The word was: ${data.word}`;
+                gameOverScore.textContent = `Final Score: ${data.total_score}`;
+                
+                // Copy staircase content to modal
+                gameOverStaircase.innerHTML = '';
+                if (data.completed_words) {
+                    data.completed_words.forEach(word => {
+                        const stair = document.createElement('div');
+                        stair.className = 'stair';
+                        stair.style.setProperty('--level', word.level - 3);
+                        
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'word';
+                        wordSpan.textContent = word.word;
+                        
+                        const attemptsSpan = document.createElement('span');
+                        attemptsSpan.className = 'attempts';
+                        attemptsSpan.textContent = `Solved in ${word.attempts} ${word.attempts === 1 ? 'try' : 'tries'}`;
+                        
+                        stair.appendChild(wordSpan);
+                        stair.appendChild(attemptsSpan);
+                        gameOverStaircase.appendChild(stair);
+                    });
+                }
+                
+                // Show the modal
+                gameOverModal.style.display = "block";
+                
                 guessInput.disabled = true;
                 submitButton.disabled = true;
                 hintButton.disabled = true;
@@ -291,6 +324,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     hintButton.addEventListener('click', getHint);
+    
+    // Close modal when clicking the X
+    closeModalBtn.onclick = function() {
+        gameOverModal.style.display = "none";
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == gameOverModal) {
+            gameOverModal.style.display = "none";
+        }
+    }
     
     // Initialize the game
     createGameBoard();
