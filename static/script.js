@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     hintButton.disabled = true;
                 }
             } else if (data.game_over) {
-                showMessage(`Game Over! The word was: ${data.word}`);
+                showMessage(`Game Over! The word was: ${data.word}. Final Score: ${data.total_score}`);
                 guessInput.disabled = true;
                 submitButton.disabled = true;
                 hintButton.disabled = true;
