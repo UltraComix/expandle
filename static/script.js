@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOverScore = document.getElementById('gameOverScore');
     const gameOverStaircase = document.getElementById('gameOverStaircase');
     const staircase = document.querySelector('.staircase');
+    const playAgainButton = document.getElementById('playAgainButton');
     
     const keyboardLayout = [
         ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -336,6 +337,26 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOverModal.style.display = "none";
         }
     }
+    
+    // Handle play again button click
+    playAgainButton.addEventListener('click', async function() {
+        try {
+            const response = await fetch('/', {
+                method: 'GET'
+            });
+            
+            if (response.ok) {
+                // Reload the page to start a new game
+                window.location.reload();
+            } else {
+                console.error('Error starting new game:', response.statusText);
+                showMessage('Error starting new game', true);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('Error starting new game', true);
+        }
+    });
     
     // Initialize the game
     createGameBoard();

@@ -321,6 +321,33 @@ h1 {
     background: #e8e8e8;
 }
 
+.play-again-button {
+    display: block;
+    width: 200px;
+    margin: 20px auto 10px;
+    padding: 12px 24px;
+    background-color: var(--correct-color);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.play-again-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #6a006a;
+}
+
+.play-again-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 /* Modal Styles */
 .modal {
     display: none;
@@ -361,16 +388,35 @@ h1 {
 
 #gameOverTitle {
     color: var(--correct-color);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-align: center;
     font-size: 1.4em;
 }
 
 #gameOverScore {
-    font-size: 1.2em;
+    font-size: 2em;
     text-align: center;
-    margin-bottom: 20px;
-    color: #333;
+    margin: 15px auto 25px;
+    color: #e41e3f;
+    font-weight: bold;
+    padding: 15px;
+    background: rgba(228, 30, 63, 0.1);
+    border-radius: 15px;
+    width: fit-content;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(228, 30, 63, 0.2);
+    animation: scoreAppear 0.5s ease-out;
+}
+
+@keyframes scoreAppear {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 #gameOverStaircase {
