@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Expandle - The Word Game That Grows With You</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Add meta tags for SEO -->
+    <meta name="description" content="Learn about Expandle, the progressive word game that combines the best of Wordle with expanding word lengths. Perfect for word game enthusiasts!">
+    <meta name="keywords" content="Expandle, word game, Wordle alternative, vocabulary game, educational game, free word game">
+    <style>
+        .about-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #9b59b6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .home-button:hover {
+            background: #8e44ad;
+        }
+
+        .home-icon {
+            font-size: 20px;
+        }
+
+        h1, h2 {
+            color: #9b59b6;
+            margin-top: 30px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li:before {
+            content: "•";
+            color: #9b59b6;
+            font-size: 20px;
+            position: absolute;
+            left: 0;
+        }
+
+        .educational-benefits {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        @media (max-width: 600px) {
+            .about-container {
+                padding: 15px;
+            }
+            
+            .home-button {
+                position: static;
+                margin: 20px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-button">
+        <span class="home-icon">🏠</span>
+        Play Expandle
+    </a>
+
+    <div class="about-container">
+        <h1>About Expandle</h1>
+
+        <div class="section">
+            <h2>Our Story</h2>
+            <p>Welcome to Expandle, the word game that grows with you! Born from a love of word puzzles and a desire to create something uniquely challenging, Expandle takes the best elements of popular word games like Wordle and adds an exciting twist – words that expand as you progress.</p>
+        </div>
+
+        <div class="section">
+            <h2>What Makes Expandle Different?</h2>
+            <p>Unlike traditional word games that stick to one word length, Expandle keeps you on your toes by gradually increasing the challenge. Start with simple 3-letter words and work your way up to master 8-letter words. It's like having multiple word games in one, with each level bringing new excitement and challenges.</p>
+        </div>
+
+        <div class="section">
+            <h2>Why Play Expandle?</h2>
+            <ul class="feature-list">
+                <li><strong>Progressive Challenge:</strong> Start easy, finish strong! Perfect for both casual players and word game enthusiasts</li>
+                <li><strong>Brain Training:</strong> Enhance your vocabulary and problem-solving skills as words get longer</li>
+                <li><strong>Daily Challenge:</strong> New words every day, just like your favorite word games</li>
+                <li><strong>Family Friendly:</strong> Suitable for all ages, making it perfect for family game time</li>
+                <li><strong>Free to Play:</strong> No subscriptions, unlimited play, just pure word-guessing fun</li>
+                <li><strong>Score System:</strong> Earn more points by solving words in fewer attempts</li>
+                <li><strong>Hint System:</strong> Stuck on a tough word? Use our hint system strategically</li>
+                <li><strong>Compete with Friends:</strong> Progressive scoring system - can you beat your rivals?</li>
+            </ul>
+        </div>
+
+        <div class="section educational-benefits">
+            <h2>Educational Benefits</h2>
+            <p>Expandle isn't just a game – it's a tool for learning! The progressive difficulty helps players:</p>
+            <ul class="feature-list">
+                <li>Build vocabulary naturally</li>
+                <li>Improve spelling skills</li>
+                <li>Develop pattern recognition</li>
+                <li>Enhance problem-solving abilities</li>
+                <li>Boost memory and concentration</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>For Fans of Word Games</h2>
+            <p>If you enjoy games like Wordle, Spelling Bee, or Words with Friends, you'll love how Expandle combines familiar word-guessing mechanics with our unique expanding-word concept. It's the perfect addition to your daily word game routine!</p>
+        </div>
+    </div>
+</body>
+</html>

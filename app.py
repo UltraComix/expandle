@@ -270,6 +270,10 @@ def home():
     response.set_cookie('game_state', json.dumps(game_state.to_dict()))
     return response
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 @app.route('/api/guess', methods=['POST'])
 def guess():
     game_state = GameState()  # This will load from cookie
