@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentLevel = 3;
     
+    function trackGameEvent(action, params) {
+        if (window.ga) {
+            window.ga('send', 'event', 'Game', action, params);
+        }
+    }
+    
     function showMessage(text, isError = false) {
         messageDiv.textContent = text;
         messageDiv.className = isError ? 'message error' : 'message success';
@@ -128,6 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        // Track guess attempt
+        trackGameEvent('guess_attempt', {
+            level: currentLevel,
+            word_length: guess.length
+        });
+        
         try {
             const response = await fetch('/api/guess', {
                 method: 'POST',
@@ -201,6 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
             guessInput.value = '';
             
             if (data.is_correct) {
+                // Track correct guess
+                trackGameEvent('correct_guess', {
+                    level: currentLevel,
+                    attempts: data.attempts
+                });
+                
                 showMessage('Correct! Well done!');
                 
                 // Update progress staircase
@@ -235,6 +253,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     hintButton.disabled = true;
                 }
             } else if (data.game_over) {
+                // Track incorrect guess
+                trackGameEvent('incorrect_guess', {
+                    level: currentLevel,
+                    attempts: data.attempts
+                });
+                
                 // Update game over modal content
                 gameOverTitle.textContent = `Game Over! The word was: ${data.word}`;
                 gameOverScore.textContent = `Final Score: ${data.total_score}`;
@@ -276,6 +300,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function getHint() {
+        // Track hint usage
+        trackGameEvent('hint_used', {
+            level: currentLevel,
+            attempts: attemptsSpan.textContent
+        });
+        
         try {
             const response = await fetch('/api/hint', {
                 method: 'POST',
