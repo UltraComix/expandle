@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request, make_response
+from flask_talisman import Talisman
 from datetime import datetime
 import random
 import os
@@ -6,6 +7,31 @@ import json
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a random secret key
+
+# Security headers and HTTPS
+csp = {
+    'default-src': "'self'",
+    'script-src': ["'self'", "'unsafe-inline'"],  # Needed for inline scripts
+    'style-src': ["'self'", "'unsafe-inline'"],   # Needed for inline styles
+    'img-src': ["'self'", "data:"],               # Needed for images
+    'font-src': ["'self'", "data:"],              # Needed for fonts
+}
+
+Talisman(app,
+         force_https=True,
+         strict_transport_security=True,
+         session_cookie_secure=True,
+         session_cookie_http_only=True,
+         content_security_policy=csp)
+
+# Add security headers to all responses
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
 
 # Word lists for different levels using common, everyday words
 WORD_LISTS = {
