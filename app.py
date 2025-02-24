@@ -136,6 +136,9 @@ class GameState:
         self.feedback_history = {}  # Store feedback history for hint selection
         print(f"Game reset to level {self.current_level}, word: {self.current_word}")
 
+    def initialize_new_game(self):
+        self.reset_game()
+
     def save_to_session(self):
         """Save current state to session"""
         print(f"Saving to session - level: {self.current_level}, word: {self.current_word}, attempts: {self.attempts}")
@@ -277,7 +280,7 @@ class GameState:
         self.total_score -= 1
         # self.save_to_session()
         print(f"Providing hint letter: {hint_letter}")
-        return hint_letter
+        return {"letter": hint_letter}
 
     def next_level(self):
         """Move to the next level and reset game state for the new level."""
@@ -313,7 +316,14 @@ def rules():
 
 @app.route('/test')
 def test():
-    return render_template('test-index.html')
+    # Initialize a new game state for the test route
+    game_state = GameState()
+    game_state.initialize_new_game()
+    
+    # Create response with cookie
+    resp = make_response(render_template('test-index.html'))
+    resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
+    return resp
 
 @app.route('/guess', methods=['POST'])
 def guess():
@@ -374,13 +384,16 @@ def get_hint():
     if game_state.hint_used:
         return jsonify({"error": "Hint already used for this level"}), 400
         
+    if game_state.total_score < 1:
+        return jsonify({"error": "Need at least 1 point to use hint"}), 400
+        
     hint = game_state.get_hint()
     if hint is None:
         return jsonify({"error": "No hint available"}), 400
     
     # Create response with cookie
     resp = make_response(jsonify({
-        "letter": hint,
+        "letter": hint["letter"],
         "total_score": game_state.total_score
     }))
     resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
