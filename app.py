@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, make_response
+from flask import Flask, render_template, jsonify, request, make_response, redirect
 from flask_talisman import Talisman
 from datetime import datetime
 import random
@@ -32,6 +32,13 @@ def add_security_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     return response
+
+# Add URL redirect for non-www to www
+@app.before_request
+def redirect_to_www():
+    if request.headers.get('Host', '').startswith('expandle.com'):
+        url = request.url.replace('expandle.com', 'www.expandle.com', 1)
+        return redirect(url, code=301)
 
 # Word lists for different levels using common, everyday words
 WORD_LISTS = {
