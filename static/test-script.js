@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.textContent = guess[index].toUpperCase();
                 
                 // Update cell color based on result
-                if (result === 0) {
+                if (result === 2) {
                     cell.className = 'cell correct';
                     // Update keyboard
                     const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Update keyboard
                     const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
                     if (key && !key.classList.contains('correct')) key.className = 'key wrong-position';
-                } else if (result === 2) {
+                } else {
                     cell.className = 'cell wrong';
                     // Update keyboard
                     const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
