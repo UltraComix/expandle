@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play Expandle - Rules and Scoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="description" content="Learn how to play Expandle, the progressive word game where words expand from 3 to 8 letters. View game rules, scoring system, and tips.">
+    <style>
+        .rules-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .home-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #9b59b6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .home-button:hover {
+            background: #8e44ad;
+        }
+
+        .home-icon {
+            font-size: 20px;
+        }
+
+        h1, h2 {
+            color: #9b59b6;
+            margin-top: 30px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .color-example {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+            border-radius: 4px;
+        }
+
+        .purple-box {
+            background: #9b59b6;
+        }
+
+        .red-box {
+            background: #e74c3c;
+        }
+
+        .gray-box {
+            background: #95a5a6;
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .scoring-table th, .scoring-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .scoring-table th {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .scoring-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-list li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .tips-list li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .level-card {
+            background: #f7f9fc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #9b59b6;
+        }
+
+        .image-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #9b59b6;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .rules-container {
+                padding: 15px;
+            }
+            
+            .home-button {
+                position: static;
+                margin: 20px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="home-button">
+        <span class="home-icon">🏠</span>
+        Play Expandle
+    </a>
+
+    <div class="rules-container">
+        <h1>How to Play Expandle</h1>
+        
+        <div class="section">
+            <p>Expandle is a word-guessing game where words get longer as you progress. Challenge yourself to guess words of increasing length, starting from 3 letters and expanding up to 8 letters!</p>
+            
+            <div class="image-placeholder">
+                <img src="{{ url_for('static', filename='images/gameboard.jpg') }}" alt="Expandle Game Board Example" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Game Rules</h2>
+            <ul class="tips-list">
+                <li>Start with 3-letter words and progress up to 8-letter words</li>
+                <li>You have 8 attempts to guess each word</li>
+                <li>All words are common English words</li>
+                <li>Each guess must be a valid word of the correct length</li>
+            </ul>
+
+            <h3>Color Feedback</h3>
+            <p><span class="color-example purple-box"></span> <strong>Purple:</strong> Letter is correct and in the right position</p>
+            <p><span class="color-example red-box"></span> <strong>Red:</strong> Letter is in the word but in the wrong position</p>
+            <p><span class="color-example gray-box"></span> <strong>Gray:</strong> Letter is not in the word</p>
+
+            <div class="image-placeholder">
+                <img src="{{ url_for('static', filename='images/keyboard.jpg') }}" alt="Expandle Keyboard Example" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Scoring System</h2>
+            <table class="scoring-table">
+                <tr>
+                    <th>Attempt</th>
+                    <th>Points</th>
+                </tr>
+                <tr><td>First attempt</td><td>10 points</td></tr>
+                <tr><td>Second attempt</td><td>8 points</td></tr>
+                <tr><td>Third attempt</td><td>6 points</td></tr>
+                <tr><td>Fourth attempt</td><td>5 points</td></tr>
+                <tr><td>Fifth attempt</td><td>4 points</td></tr>
+                <tr><td>Sixth attempt</td><td>3 points</td></tr>
+                <tr><td>Seventh attempt</td><td>2 points</td></tr>
+                <tr><td>Eighth attempt</td><td>1 point</td></tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Special Features</h2>
+            <ul class="tips-list">
+                <li>Use the hint button to reveal one correct letter (costs 1 point)</li>
+                <li>Track your progress with the staircase display of completed words</li>
+                <li>Challenge yourself to reach the highest level and score</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Tips</h2>
+            <ul class="tips-list">
+                <li>Start with common letters like vowels (A, E, I, O, U)</li>
+                <li>Look for patterns in word families</li>
+                <li>Use your previous guesses to inform your next attempt</li>
+                <li>Save hints for longer words when you really need them</li>
+                <li>Try to maintain a high score by guessing words in fewer attempts</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Game Progress</h2>
+            <div class="levels-grid">
+                <div class="level-card">Level 1:<br>3-letter words</div>
+                <div class="level-card">Level 2:<br>4-letter words</div>
+                <div class="level-card">Level 3:<br>5-letter words</div>
+                <div class="level-card">Level 4:<br>6-letter words</div>
+                <div class="level-card">Level 5:<br>7-letter words</div>
+                <div class="level-card">Level 6:<br>8-letter words</div>
+            </div>
+            <p class="text-center"><strong>Can you make it through all levels and become an Expandle master?</strong></p>
+        </div>
+    </div>
+</body>
+</html>

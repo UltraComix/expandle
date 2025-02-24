@@ -274,6 +274,10 @@ def home():
 def about():
     return render_template('about.html')
 
+@app.route('/rules')
+def rules():
+    return render_template('rules.html')
+
 @app.route('/api/guess', methods=['POST'])
 def guess():
     game_state = GameState()  # This will load from cookie
