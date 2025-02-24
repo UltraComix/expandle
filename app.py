@@ -208,11 +208,25 @@ class GameState:
         self.feedback_history[guess] = result
         
         is_correct = all(r == 2 for r in result)
+        if is_correct:
+            # Add points for correct guess
+            points = self.get_points_for_attempt(self.attempts)
+            self.total_score += points
+            print(f"Added {points} points for solving in {self.attempts} attempts")
+            
+            # Add to completed words
+            self.completed_words.append({
+                "word": self.current_word,
+                "level": len(self.current_word),
+                "attempts": self.attempts
+            })
         
         return {
             "result": result,
             "is_correct": is_correct,
-            "attempts": self.attempts
+            "attempts": self.attempts,
+            "total_score": self.total_score,
+            "completed_words": self.completed_words if is_correct else None
         }
 
     def get_hint(self):
@@ -331,32 +345,25 @@ def guess():
         "result": result["result"],
         "is_correct": result["is_correct"],
         "attempts": result["attempts"],
-        "total_score": game_state.total_score,
+        "total_score": result["total_score"],
         "current_level": game_state.current_level,  # Always include current level
         "current_word_length": len(game_state.current_word)  # Add word length
     }
     
     if result["is_correct"]:
         # Add the completed word to the list
-        game_state.completed_words.append({
-            "word": game_state.current_word,
-            "level": len(game_state.current_word),  
-            "attempts": game_state.attempts
-        })
+        response["completed_words"] = result["completed_words"]
         
         # Move to next level
         next_level = game_state.next_level()
         if next_level:
             response["current_level"] = game_state.current_level
-            response["completed_words"] = game_state.completed_words
         else:
             response["game_over"] = True
             response["word"] = game_state.current_word
-            response["completed_words"] = game_state.completed_words  
     elif game_state.attempts >= MAX_ATTEMPTS:
         response["game_over"] = True
         response["word"] = game_state.current_word
-        response["completed_words"] = game_state.completed_words  # Add completed words when game is lost
     
     # Create response with cookie
     resp = make_response(jsonify(response))
