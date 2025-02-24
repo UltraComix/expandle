@@ -315,7 +315,7 @@ def rules():
 def test():
     return render_template('test-index.html')
 
-@app.route('/api/guess', methods=['POST'])
+@app.route('/guess', methods=['POST'])
 def guess():
     game_state = GameState()  # This will load from cookie
     print(f"Current game state - level: {game_state.current_level}, attempts: {game_state.attempts}, word: {game_state.current_word}")
@@ -347,7 +347,6 @@ def guess():
             "level": len(game_state.current_word),  
             "attempts": game_state.attempts
         })
-        # game_state.save_to_session()
         
         # Move to next level
         next_level = game_state.next_level()
@@ -368,28 +367,24 @@ def guess():
     resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
     return resp
 
-@app.route('/api/hint', methods=['POST'])
+@app.route('/hint', methods=['POST'])
 def get_hint():
     game_state = GameState()  # This will load from cookie
-
+    
     if game_state.hint_used:
         return jsonify({"error": "Hint already used for this level"}), 400
         
-    if game_state.total_score < 1:
-        return jsonify({"error": "Need at least 1 point to use hint"}), 400
-        
     hint = game_state.get_hint()
-    if hint:
-        response = {
-            "letter": hint,
-            "total_score": game_state.total_score
-        }
-        # Create response with cookie
-        resp = make_response(jsonify(response))
-        resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
-        return resp
-        
-    return jsonify({"error": "No hint available"}), 400
+    if hint is None:
+        return jsonify({"error": "No hint available"}), 400
+    
+    # Create response with cookie
+    resp = make_response(jsonify({
+        "letter": hint,
+        "total_score": game_state.total_score
+    }))
+    resp.set_cookie('game_state', json.dumps(game_state.to_dict()))
+    return resp
 
 if __name__ == '__main__':
     app.run(debug=True)
