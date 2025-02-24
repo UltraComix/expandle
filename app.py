@@ -10,11 +10,11 @@ app.secret_key = os.urandom(24)  # Generate a random secret key
 
 # Security headers and HTTPS
 csp = {
-    'default-src': "'self'",
-    'script-src': ["'self'", "'unsafe-inline'"],  # Needed for inline scripts
-    'style-src': ["'self'", "'unsafe-inline'"],   # Needed for inline styles
+    'default-src': ["'self'", "cdnjs.cloudflare.com"],
+    'script-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],  # Needed for inline scripts
+    'style-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],   # Allow loading from cdnjs
     'img-src': ["'self'", "data:"],               # Needed for images
-    'font-src': ["'self'", "data:"],              # Needed for fonts
+    'font-src': ["'self'", "data:", "cdnjs.cloudflare.com"],              # Allow loading fonts from cdnjs
 }
 
 Talisman(app,
@@ -310,6 +310,10 @@ def about():
 @app.route('/rules')
 def rules():
     return render_template('rules.html')
+
+@app.route('/test')
+def test():
+    return render_template('test-index.html')
 
 @app.route('/api/guess', methods=['POST'])
 def guess():

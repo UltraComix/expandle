@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expandle Test - The Expanding Word Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='test-style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8WKE726N03"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8WKE726N03');
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header">
+                <h1>Expandle Test</h1>
+                <div style="position: absolute; right: 20px; top: 20px;">
+                    <a href="/rules" class="nav-link" style="color: #9b59b6; text-decoration: none; font-weight: bold; margin-right: 20px;">Rules</a>
+                    <a href="/about" class="nav-link" style="color: #9b59b6; text-decoration: none; font-weight: bold;">About</a>
+                </div>
+            </div>
+            <div class="game-info">
+                <p>Level: <span id="currentLevel">3</span> letters</p>
+                <p class="attempts-container">
+                    Attempts: <span id="attempts">0</span>/8
+                    <button id="hintButton" class="hint-button" title="Get a hint (-1 point)">
+                        <i class="fas fa-lightbulb"></i>
+                    </button>
+                </p>
+                <p>Total Score: <span id="totalScore">0</span></p>
+            </div>
+        </header>
+
+        <main>
+            <div id="gameBoard">
+                <!-- Game tiles will be generated here -->
+            </div>
+
+            <div class="input-section">
+                <input type="text" id="guessInput" placeholder="Enter your guess" maxlength="9">
+                <button id="submitGuess">Guess</button>
+            </div>
+
+            <div id="message" class="message"></div>
+        </main>
+
+        <div id="keyboard" class="keyboard">
+            <!-- Virtual keyboard will be generated here -->
+        </div>
+
+        <div id="progressStaircase" class="progress-staircase">
+            <h2>Progress</h2>
+            <div class="staircase"></div>
+        </div>
+
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="gameOverTitle"></h2>
+                <p id="gameOverScore"></p>
+                <div id="gameOverStaircase"></div>
+                <button id="playAgainButton">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='test-script.js') }}"></script>
+</body>
+</html>
