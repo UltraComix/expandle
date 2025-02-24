@@ -170,64 +170,50 @@ class GameState:
         return word
     
     def check_guess(self, guess):
-        print(f"Checking guess '{guess}' against word '{self.current_word}' (attempts: {self.attempts})")
+        """Check a guess against the current word.
+        Returns a list where each element is:
+        2 = correct letter in correct position
+        1 = correct letter in wrong position
+        0 = letter not in word
+        """
+        print(f"Checking guess {guess} against word {self.current_word}")
+        
         if len(guess) != len(self.current_word):
-            print(f"Length mismatch: guess={len(guess)}, expected={len(self.current_word)}")
             return None
-        
+            
         self.attempts += 1
-        print(f"Attempts now: {self.attempts}")
-        result = []
-        is_correct = guess.lower() == self.current_word.lower()
         
-        # Convert strings to lists for easier manipulation
-        word_chars = list(self.current_word.lower())
-        guess_chars = list(guess.lower())
+        # Convert guess and word to list of characters
+        guess_chars = list(guess)
+        word_chars = list(self.current_word)
+        result = [0] * len(guess)
+        used_positions = set()
         
-        # Count occurrences of each letter in the target word
-        word_letter_count = {}
-        for letter in word_chars:
-            word_letter_count[letter] = word_letter_count.get(letter, 0) + 1
+        # First pass: mark correct positions
+        for i in range(len(guess)):
+            if guess_chars[i] == word_chars[i]:
+                result[i] = 2
+                used_positions.add(i)
         
-        # Track how many of each letter we've marked as correct
-        correct_letter_count = {}
+        # Second pass: mark letters in wrong positions
+        for i in range(len(guess)):
+            if result[i] != 2:  # Skip already marked correct positions
+                for j in range(len(word_chars)):
+                    if j not in used_positions and guess_chars[i] == word_chars[j]:
+                        result[i] = 1
+                        used_positions.add(j)
+                        break
         
-        if is_correct:
-            # If the guess is correct, mark all letters as correct
-            result = [{"letter": c, "status": "correct"} for c in guess_chars]
-            print("Word is correct - all letters marked as correct")
-            # Add points for correct guess
-            points = self.get_points_for_attempt(self.attempts)
-            self.total_score += points
-            print(f"Added {points} points for solving in {self.attempts} attempts")
-        else:
-            # First pass: Check for exact matches
-            result = [{"letter": c, "status": "wrong"} for c in guess_chars]
-            
-            # Mark correct positions first
-            for i, (guess_char, word_char) in enumerate(zip(guess_chars, word_chars)):
-                if guess_char == word_char:
-                    result[i]["status"] = "correct"
-                    correct_letter_count[guess_char] = correct_letter_count.get(guess_char, 0) + 1
-            
-            # Second pass: Check for wrong positions
-            # Only mark as wrong-position if we haven't exceeded the count of that letter in the word
-            for i, guess_char in enumerate(guess_chars):
-                if result[i]["status"] == "wrong":  # Skip already correct ones
-                    correct_count = correct_letter_count.get(guess_char, 0)
-                    wrong_pos_allowed = word_letter_count.get(guess_char, 0) - correct_count
-                    
-                    if wrong_pos_allowed > 0 and guess_char in word_chars:
-                        result[i]["status"] = "wrong-position"
-                        correct_letter_count[guess_char] = correct_letter_count.get(guess_char, 0) + 1
+        # Store this guess result for hint selection
+        self.feedback_history[guess] = result
         
-        # Store feedback for hint system
-        self.feedback_history[self.attempts] = [r["status"] for r in result]
+        is_correct = all(r == 2 for r in result)
         
-        # Save state after updating
-        # self.save_to_session()
-        print(f"Returning result for guess '{guess}': {result}")
-        return {"result": result, "is_correct": is_correct, "attempts": self.attempts}
+        return {
+            "result": result,
+            "is_correct": is_correct,
+            "attempts": self.attempts
+        }
 
     def get_hint(self):
         print(f"Getting hint. Hint used this level: {self.hint_used}, Total score: {self.total_score}")
