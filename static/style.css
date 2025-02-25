@@ -274,17 +274,16 @@ h1 {
 }
 
 .progress-staircase {
-    margin-top: 30px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 20px auto;
+    max-width: 400px;
+    text-align: left;
+    padding: 0 20px;
 }
 
 .progress-staircase h2 {
     text-align: center;
+    color: #9b59b6;
     margin-bottom: 15px;
-    color: #333;
 }
 
 .staircase {
@@ -293,32 +292,60 @@ h1 {
     gap: 10px;
 }
 
-.stair {
+.step {
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(155, 89, 182, 0.2); /* Light purple/lilac */
+    color: #fff;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    margin-left: calc(var(--level) * 20px); /* Indentation based on level */
+    border-left: 3px solid rgba(155, 89, 182, 0.5);
+}
+
+.step.completed {
+    background-color: rgba(155, 89, 182, 0.4);
+    border-left-color: #9b59b6;
+}
+
+.step.current {
+    background-color: rgba(155, 89, 182, 0.6);
+    border-left-color: #9b59b6;
+    font-weight: bold;
+}
+
+.step .attempts {
+    float: right;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.hint-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+    margin-left: 10px;
+    transition: transform 0.2s;
+}
+
+.hint-button:hover {
+    transform: scale(1.1);
+}
+
+.hint-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.attempts-container {
     display: flex;
     align-items: center;
-    padding: 10px 15px;
-    background: var(--background-color);
-    border-radius: 5px;
-    margin-left: calc(var(--level) * 20px);
-    transition: all 0.3s ease;
-}
-
-.stair .word {
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--correct-color);
-}
-
-.stair .attempts {
-    margin-left: auto;
-    color: #666;
-    font-size: 0.9em;
-}
-
-.stair:hover {
-    transform: translateX(5px);
-    background: #e8e8e8;
+    justify-content: center;
+    gap: 5px;
 }
 
 .play-again-button {
