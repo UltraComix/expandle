@@ -24,6 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentLevel = 3;
     
+    function trackGameEvent(eventName, data) {
+        // Implement Google Analytics event tracking here
+        console.log(`Tracking event: ${eventName}`, data);
+    }
+    
+    // Track game start
+    trackGameEvent('game_start', {
+        starting_level: currentLevel
+    });
+    
     function showMessage(text, isError = false) {
         messageDiv.textContent = text;
         messageDiv.className = isError ? 'message error' : 'message success';
@@ -168,37 +178,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
+            // Update attempts display
+            attemptsSpan.textContent = data.attempts;
+            
             // Clear input
             guessInput.value = '';
             
-            if (data.is_correct) {
-                if (data.game_over) {
-                    // Show game over screen
-                    gameOverTitle.textContent = 'Congratulations!';
-                    gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>`;
-                    gameOverModal.style.display = 'block';
-                } else {
-                    showMessage('Correct! Well done!');
-                    // Update for next level
-                    setTimeout(() => {
-                        currentLevel = data.current_level;
-                        currentLevelSpan.textContent = currentLevel;
-                        createGameBoard();
-                        // Reset keyboard colors
-                        keyboard.querySelectorAll('.key').forEach(key => {
-                            if (key.getAttribute('data-key') !== 'ENTER' && key.getAttribute('data-key') !== 'DEL') {
-                                key.className = 'key';
-                            }
-                        });
-                        // Enable hint button for new level
-                        hintButton.disabled = false;
-                        hintButton.title = "Get a hint (-1 point)";
-                    }, 1500);  // Delay to show the correct answer
-                }
-            } else if (data.game_over) {
-                gameOverTitle.textContent = 'Game Over';
-                gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>The word was: ${data.word}`;
+            if (!data.correct && !data.game_over) {
+                // Track incorrect guess
+                trackGameEvent('incorrect_guess', {
+                    level: currentLevel,
+                    attempt: data.attempts
+                });
+            }
+            
+            if (data.game_over) {
+                // Track game over event
+                trackGameEvent('game_over', {
+                    final_score: data.total_score,
+                    final_level: currentLevel,
+                    completed_words: data.completed_words ? data.completed_words.length : 0
+                });
+                
+                gameOverTitle.textContent = "Game Over!";
+                gameOverScore.textContent = `Final Score: ${data.total_score}\nCorrect Word: ${data.current_word}`;
                 gameOverModal.style.display = 'block';
+            }
+            
+            if (data.level_complete) {
+                // Track level completion
+                trackGameEvent('level_complete', {
+                    level: currentLevel,
+                    attempts: data.attempts,
+                    score: data.total_score
+                });
+                
+                showMessage('Level Complete! Moving to next level...');
+                currentLevel++;
+                setTimeout(() => {
+                    createGameBoard();
+                }, 1500);
+            }
+            
+            if (data.correct) {
+                // Track correct guess
+                trackGameEvent('correct_guess', {
+                    level: currentLevel,
+                    attempt: data.attempts
+                });
             }
             
             if (data.completed_words) {
@@ -228,6 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (data.letter) {
+                // Track hint usage
+                trackGameEvent('hint_used', {
+                    level: currentLevel,
+                    remaining_score: data.total_score
+                });
+                
                 // Update total score
                 totalScoreSpan.textContent = data.total_score;
                 
