@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 gameOverTitle.textContent = "Game Over!";
-                gameOverScore.textContent = `Final Score: ${data.total_score}\nCorrect Word: ${data.word}`;
+                gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>Correct Word: ${data.word}`;
                 gameOverModal.style.display = 'block';
             }
             
