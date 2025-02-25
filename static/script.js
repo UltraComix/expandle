@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         try {
-            const response = await fetch('/api/guess', {
+            const response = await fetch('/guess', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
