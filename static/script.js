@@ -24,12 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let currentLevel = 3;
     
-    function trackGameEvent(action, params) {
-        if (window.ga) {
-            window.ga('send', 'event', 'Game', action, params);
-        }
-    }
-    
     function showMessage(text, isError = false) {
         messageDiv.textContent = text;
         messageDiv.className = isError ? 'message error' : 'message success';
@@ -56,89 +50,72 @@ document.addEventListener('DOMContentLoaded', () => {
             
             gameBoard.appendChild(row);
         }
-        
-        // Reset hint button
-        hintButton.disabled = false;
-        hintButton.title = "Get a hint (-1 point)";
-        
-        // Update input max length and placeholder
-        guessInput.maxLength = currentLevel;
-        guessInput.placeholder = `Enter ${currentLevel}-letter word`;
-        guessInput.value = ''; // Clear any existing input
-        
-        // Update level display
-        currentLevelSpan.textContent = currentLevel;
-        
-        // Reset attempts
-        attemptsSpan.textContent = '0';
-        
-        // Create fresh keyboard
-        createKeyboard();
     }
     
     function createKeyboard() {
         keyboard.innerHTML = '';
-        
-        keyboardLayout.forEach(row => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'keyboard-row';
+        keyboardLayout.forEach((row, i) => {
+            const keyboardRow = document.createElement('div');
+            keyboardRow.className = 'keyboard-row';
             
             row.forEach(key => {
-                const keyButton = document.createElement('button');
-                keyButton.className = key === 'ENTER' || key === 'DEL' ? 'key key-special' : 'key';
-                keyButton.textContent = key === 'DEL' ? '⌫' : key;
-                keyButton.dataset.key = key;
-                keyButton.addEventListener('click', () => {
-                    if (key === 'ENTER') {
-                        submitGuess();
-                    } else if (key === 'DEL') {
+                const button = document.createElement('button');
+                button.className = 'key';
+                button.textContent = key;
+                button.setAttribute('data-key', key);
+                
+                if (key === 'ENTER') {
+                    button.onclick = submitGuess;
+                } else if (key === 'DEL') {
+                    button.onclick = () => {
                         guessInput.value = guessInput.value.slice(0, -1);
-                    } else if (guessInput.value.length < currentLevel) {
-                        guessInput.value += key;
-                    }
-                });
-                rowDiv.appendChild(keyButton);
+                    };
+                } else {
+                    button.onclick = () => {
+                        if (guessInput.value.length < currentLevel) {
+                            guessInput.value += key.toLowerCase();
+                        }
+                    };
+                }
+                
+                keyboardRow.appendChild(button);
             });
             
-            keyboard.appendChild(rowDiv);
+            keyboard.appendChild(keyboardRow);
         });
     }
     
     function updateStaircase(completedWords) {
         staircase.innerHTML = '';
         
-        completedWords.forEach(word => {
-            const stair = document.createElement('div');
-            stair.className = 'stair';
-            stair.style.setProperty('--level', word.level - 3); // Start indentation from 0
+        // Create steps for levels 3 to 8
+        for (let level = 3; level <= 8; level++) {
+            const step = document.createElement('div');
+            step.className = 'step';
+            step.style.setProperty('--level', level - 3);  // For indentation
             
-            const wordSpan = document.createElement('span');
-            wordSpan.className = 'word';
-            wordSpan.textContent = word.word;
+            // Find if this level was completed
+            const completedWord = completedWords ? completedWords.find(w => w.level === level) : null;
             
-            const attemptsSpan = document.createElement('span');
-            attemptsSpan.className = 'attempts';
-            attemptsSpan.textContent = `Solved in ${word.attempts} ${word.attempts === 1 ? 'try' : 'tries'}`;
+            if (completedWord) {
+                step.classList.add('completed');
+                step.innerHTML = `${level}: ${completedWord.word} <span class="attempts">(${completedWord.attempts} tries)</span>`;
+            } else if (level === currentLevel) {
+                step.classList.add('current');
+                step.textContent = `${level}: Current Level`;
+            } else if (level < currentLevel) {
+                step.textContent = `${level}: Skipped`;
+            } else {
+                step.textContent = '';  // Leave future levels blank
+            }
             
-            stair.appendChild(wordSpan);
-            stair.appendChild(attemptsSpan);
-            staircase.appendChild(stair);
-        });
+            staircase.appendChild(step);
+        }
     }
     
     async function submitGuess() {
-        const guess = guessInput.value.trim().toUpperCase();
-        
-        if (guess.length !== currentLevel) {
-            showMessage(`Please enter a ${currentLevel}-letter word`, true);
-            return;
-        }
-        
-        // Track guess attempt
-        trackGameEvent('guess_attempt', {
-            level: currentLevel,
-            word_length: guess.length
-        });
+        const guess = guessInput.value.toLowerCase();
+        if (!guess) return;
         
         try {
             const response = await fetch('/guess', {
@@ -146,7 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ guess: guess })
+                body: JSON.stringify({
+                    guess: guess
+                })
             });
             
             const data = await response.json();
@@ -156,55 +135,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // Update total score and attempts
-            totalScoreSpan.textContent = data.total_score;
+            // Update attempts and score
             attemptsSpan.textContent = data.attempts;
+            totalScoreSpan.textContent = data.total_score;
             
-            // Update current level if it changed
-            if (data.current_level && data.current_level !== currentLevel) {
-                currentLevel = data.current_level;
-            }
-            
-            // Get current row and update cells
+            // Get the current row
             const currentRow = gameBoard.children[data.attempts - 1];
-            if (!currentRow) {
-                console.error('No row found for attempt:', data.attempts);
-                return;
-            }
             
-            // Update the cells in the current row
-            const cells = currentRow.children;
+            // Update the cells with the result
             data.result.forEach((result, index) => {
-                const cell = cells[index];
-                cell.textContent = result.letter;
-                cell.className = `cell ${result.status}`;
+                const cell = currentRow.children[index];
+                cell.textContent = guess[index].toUpperCase();
                 
-                // Update keyboard
-                const key = keyboard.querySelector(`button[data-key="${result.letter.toUpperCase()}"]`);
-                if (key) {
-                    // Get the current status of the key
-                    const currentStatus = key.classList.contains('correct') ? 'correct' :
-                                       key.classList.contains('wrong-position') ? 'wrong-position' :
-                                       key.classList.contains('wrong') ? 'wrong' : null;
-                    
-                    // Only update if the new status is better than the current one
-                    // Priority: correct > wrong-position > wrong
-                    const shouldUpdate = 
-                        !currentStatus || // No current status
-                        (currentStatus === 'wrong' && (result.status === 'correct' || result.status === 'wrong-position')) || // Upgrade from wrong
-                        (currentStatus === 'wrong-position' && result.status === 'correct'); // Upgrade to correct
-                    
-                    if (shouldUpdate) {
-                        // Remove all status classes but keep the base 'key' class
-                        key.className = 'key';
-                        
-                        // Add the new status class
-                        key.classList.add(result.status);
-                        
-                        // Keep the key-special class if it's a special key
-                        if (key.dataset.key === 'ENTER' || key.dataset.key === 'DEL') {
-                            key.classList.add('key-special');
-                        }
+                // Update cell color based on result
+                if (result === 2) {
+                    cell.className = 'cell correct';
+                    // Update keyboard
+                    const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
+                    if (key) key.className = 'key correct';
+                } else if (result === 1) {
+                    cell.className = 'cell wrong-position';
+                    // Update keyboard
+                    const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
+                    if (key && !key.classList.contains('correct')) key.className = 'key wrong-position';
+                } else {
+                    cell.className = 'cell wrong';
+                    // Update keyboard
+                    const key = keyboard.querySelector(`button[data-key="${guess[index].toUpperCase()}"]`);
+                    if (key && !key.classList.contains('correct') && !key.classList.contains('wrong-position')) {
+                        key.className = 'key wrong';
                     }
                 }
             });
@@ -213,84 +172,38 @@ document.addEventListener('DOMContentLoaded', () => {
             guessInput.value = '';
             
             if (data.is_correct) {
-                // Track correct guess
-                trackGameEvent('correct_guess', {
-                    level: currentLevel,
-                    attempts: data.attempts
-                });
-                
                 showMessage('Correct! Well done!');
-                
-                // Update progress staircase
-                if (data.completed_words) {
-                    updateStaircase(data.completed_words);
-                }
-                
-                if (data.current_level) {
-                    // Wait for animation and message to complete before changing level
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    currentLevel = data.current_level;
-                    showMessage(`Moving to ${currentLevel}-letter words...`);
-                    // Wait for message to show before resetting board
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    createGameBoard();
-                    // Clear keyboard colors for new level
-                    const keys = keyboard.querySelectorAll('.key');
-                    keys.forEach(key => {
-                        key.className = 'key';
-                        if (key.dataset.key === 'ENTER' || key.dataset.key === 'DEL') {
-                            key.classList.add('key-special');
-                        }
-                    });
+                if (data.game_over) {
+                    // Show game over screen
+                    gameOverTitle.textContent = 'Congratulations!';
+                    gameOverScore.textContent = `Final Score: ${data.total_score}`;
+                    gameOverModal.style.display = 'block';
                 } else {
-                    showMessage('Congratulations! You\'ve completed all levels!');
-                    // Update progress staircase one final time
-                    if (data.completed_words) {
-                        updateStaircase(data.completed_words);
-                    }
-                    guessInput.disabled = true;
-                    submitButton.disabled = true;
-                    hintButton.disabled = true;
+                    // Update for next level
+                    setTimeout(() => {
+                        currentLevel = data.current_level;
+                        currentLevelSpan.textContent = currentLevel;
+                        createGameBoard();
+                        // Reset keyboard colors
+                        keyboard.querySelectorAll('.key').forEach(key => {
+                            if (key.getAttribute('data-key') !== 'ENTER' && key.getAttribute('data-key') !== 'DEL') {
+                                key.className = 'key';
+                            }
+                        });
+                        // Enable hint button for new level
+                        hintButton.disabled = false;
+                        hintButton.title = "Get a hint (-1 point)";
+                    }, 1500);  // Delay to show the correct answer
                 }
             } else if (data.game_over) {
-                // Track incorrect guess
-                trackGameEvent('incorrect_guess', {
-                    level: currentLevel,
-                    attempts: data.attempts
-                });
-                
-                // Update game over modal content
-                gameOverTitle.textContent = `Game Over! The word was: ${data.word}`;
+                showMessage(`Game Over! The word was: ${data.word}`);
+                gameOverTitle.textContent = 'Game Over';
                 gameOverScore.textContent = `Final Score: ${data.total_score}`;
-                
-                // Copy staircase content to modal
-                gameOverStaircase.innerHTML = '';
-                if (data.completed_words) {
-                    data.completed_words.forEach(word => {
-                        const stair = document.createElement('div');
-                        stair.className = 'stair';
-                        stair.style.setProperty('--level', word.level - 3);
-                        
-                        const wordSpan = document.createElement('span');
-                        wordSpan.className = 'word';
-                        wordSpan.textContent = word.word;
-                        
-                        const attemptsSpan = document.createElement('span');
-                        attemptsSpan.className = 'attempts';
-                        attemptsSpan.textContent = `Solved in ${word.attempts} ${word.attempts === 1 ? 'try' : 'tries'}`;
-                        
-                        stair.appendChild(wordSpan);
-                        stair.appendChild(attemptsSpan);
-                        gameOverStaircase.appendChild(stair);
-                    });
-                }
-                
-                // Show the modal
-                gameOverModal.style.display = "block";
-                
-                guessInput.disabled = true;
-                submitButton.disabled = true;
-                hintButton.disabled = true;
+                gameOverModal.style.display = 'block';
+            }
+            
+            if (data.completed_words) {
+                updateStaircase(data.completed_words);
             }
             
         } catch (error) {
@@ -300,14 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function getHint() {
-        // Track hint usage
-        trackGameEvent('hint_used', {
-            level: currentLevel,
-            attempts: attemptsSpan.textContent
-        });
-        
         try {
-            const response = await fetch('/api/hint', {
+            const response = await fetch('/hint', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -354,8 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Add hint button event listener
     hintButton.addEventListener('click', getHint);
-    
+
     // Close modal when clicking the X
     closeModalBtn.onclick = function() {
         gameOverModal.style.display = "none";
@@ -376,10 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             if (response.ok) {
-                // Reload the page to start a new game
                 window.location.reload();
             } else {
-                console.error('Error starting new game:', response.statusText);
                 showMessage('Error starting new game', true);
             }
         } catch (error) {
@@ -388,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // Initialize the game
+    // Initialize game
     createGameBoard();
+    createKeyboard();
 });
