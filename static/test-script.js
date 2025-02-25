@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let level = 3; level <= 8; level++) {
             const step = document.createElement('div');
             step.className = 'step';
+            step.style.setProperty('--level', level - 3);  // For indentation
             
             // Find if this level was completed
             const completedWord = completedWords ? completedWords.find(w => w.level === level) : null;
