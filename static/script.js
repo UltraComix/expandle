@@ -201,12 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 // Update and display stats
-                const isWin = currentLevel > 8;  // Won if completed level 8
+                const isWin = currentLevel === 8 && data.is_correct;  // Won if completed level 8 successfully
                 const stats = updateStats(currentLevel, data.total_score, isWin);
                 displayStats(stats);
                 
-                gameOverTitle.textContent = "Game Over!";
-                gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>Correct Word: ${data.word}`;
+                gameOverTitle.textContent = isWin ? "Congratulations!" : "Game Over!";
+                gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>${isWin ? "You completed all levels!" : `Correct Word: ${data.word}`}`;
                 gameOverModal.style.display = 'block';
             }
             
