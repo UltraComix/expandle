@@ -231,18 +231,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update total score
                 totalScoreSpan.textContent = data.total_score;
                 
-                // Find the key element
+                // Update keyboard
                 const key = keyboard.querySelector(`button[data-key="${data.letter.toUpperCase()}"]`);
                 if (key) {
-                    if (!key.classList.contains('correct')) {
-                        key.className = 'key wrong-position';
-                        showMessage(`Hint: The word contains the letter ${data.letter.toUpperCase()}`);
-                        hintButton.disabled = true;
-                        hintButton.title = "Hint already used for this level";
-                    } else {
-                        showMessage('That letter is already correctly placed!', true);
-                    }
+                    key.className = 'key wrong-position';
                 }
+                
+                showMessage(`Hint: The word contains the letter ${data.letter.toUpperCase()}`);
+                hintButton.disabled = true;
+                hintButton.title = "Hint already used for this level";
             } else {
                 showMessage('No new letters to hint - try guessing the letters you see in red!', true);
             }

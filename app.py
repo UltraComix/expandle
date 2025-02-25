@@ -239,35 +239,27 @@ class GameState:
             print("Not enough points for hint")
             return None
         
-        # Count occurrences of each letter in the target word
-        word_letter_count = {}
-        for letter in self.current_word.lower():
-            word_letter_count[letter] = word_letter_count.get(letter, 0) + 1
+        # Track letters we've already found (both correct and wrong position)
+        discovered_letters = set()
         
-        print(f"Letter counts in word: {word_letter_count}")
-        
-        # Track discovered letters and their counts
-        discovered_letter_count = {}
-        
-        # Go through all previous guesses
+        # Go through all previous guesses and their feedback
         for guess, feedback in self.feedback_history.items():
-            for i, status in enumerate(feedback):
-                if i < len(guess):  # Make sure we don't go past the guess length
+            for i, result in enumerate(feedback):
+                if i < len(guess):
                     letter = guess[i].lower()
-                    if status in [1, 2]:  # Check for both correct and wrong-position
-                        discovered_letter_count[letter] = discovered_letter_count.get(letter, 0) + 1
+                    if result == 2:  # Letter is in correct position
+                        discovered_letters.add(letter)
+                    elif result == 1:  # Letter is in word but wrong position
+                        discovered_letters.add(letter)
         
-        print(f"Discovered letter counts: {discovered_letter_count}")
+        print(f"Current word: {self.current_word}")
+        print(f"Discovered letters: {discovered_letters}")
         
-        # Find letters that haven't been fully discovered yet
+        # Get all unique letters in the word that haven't been discovered
         available_letters = []
-        for letter, target_count in word_letter_count.items():
-            discovered_count = discovered_letter_count.get(letter, 0)
-            remaining_count = target_count - discovered_count
-            
-            if remaining_count > 0:
-                # Add the letter as many times as it's still undiscovered
-                available_letters.extend([letter] * remaining_count)
+        for letter in self.current_word.lower():
+            if letter not in discovered_letters:
+                available_letters.append(letter)
         
         print(f"Available letters for hint: {available_letters}")
         
@@ -279,7 +271,6 @@ class GameState:
         hint_letter = random.choice(available_letters)
         self.hint_used = True
         self.total_score -= 1
-        # self.save_to_session()
         print(f"Providing hint letter: {hint_letter}")
         return {"letter": hint_letter}
 
