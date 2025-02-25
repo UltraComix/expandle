@@ -172,13 +172,13 @@ document.addEventListener('DOMContentLoaded', () => {
             guessInput.value = '';
             
             if (data.is_correct) {
-                showMessage('Correct! Well done!');
                 if (data.game_over) {
                     // Show game over screen
                     gameOverTitle.textContent = 'Congratulations!';
                     gameOverScore.textContent = `Final Score: ${data.total_score}`;
                     gameOverModal.style.display = 'block';
                 } else {
+                    showMessage('Correct! Well done!');
                     // Update for next level
                     setTimeout(() => {
                         currentLevel = data.current_level;
@@ -196,9 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 1500);  // Delay to show the correct answer
                 }
             } else if (data.game_over) {
-                showMessage(`Game Over! The word was: ${data.word}`);
                 gameOverTitle.textContent = 'Game Over';
-                gameOverScore.textContent = `Final Score: ${data.total_score}`;
+                gameOverScore.textContent = `Final Score: ${data.total_score}\nThe word was: ${data.word}`;
                 gameOverModal.style.display = 'block';
             }
             
