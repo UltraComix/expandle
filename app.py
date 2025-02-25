@@ -250,11 +250,12 @@ class GameState:
         discovered_letter_count = {}
         
         # Go through all previous guesses
-        for attempt_num, feedback in self.feedback_history.items():
+        for guess, feedback in self.feedback_history.items():
             for i, status in enumerate(feedback):
-                letter = self.current_word[i].lower()
-                if status in ["correct", "wrong-position"]:
-                    discovered_letter_count[letter] = discovered_letter_count.get(letter, 0) + 1
+                if i < len(guess):  # Make sure we don't go past the guess length
+                    letter = guess[i].lower()
+                    if status in [1, 2]:  # Check for both correct and wrong-position
+                        discovered_letter_count[letter] = discovered_letter_count.get(letter, 0) + 1
         
         print(f"Discovered letter counts: {discovered_letter_count}")
         
