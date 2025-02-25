@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             step.className = 'step';
             
             // Find if this level was completed
-            const completedWord = completedWords.find(w => w.level === level);
+            const completedWord = completedWords ? completedWords.find(w => w.level === level) : null;
             
             if (completedWord) {
                 step.classList.add('completed');
@@ -102,8 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (level === currentLevel) {
                 step.classList.add('current');
                 step.textContent = `${level}: Current Level`;
+            } else if (level < currentLevel) {
+                step.textContent = `${level}: Skipped`;
             } else {
-                step.textContent = `${level}: Not Started`;
+                step.textContent = '';  // Leave future levels blank
             }
             
             staircase.appendChild(step);
