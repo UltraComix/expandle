@@ -200,6 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     completed_words: data.completed_words ? data.completed_words.length : 0
                 });
                 
+                // Update and display stats
+                const isWin = currentLevel > 8;  // Won if completed level 8
+                const stats = updateStats(currentLevel, data.total_score, isWin);
+                displayStats(stats);
+                
                 gameOverTitle.textContent = "Game Over!";
                 gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>Correct Word: ${data.word}`;
                 gameOverModal.style.display = 'block';
@@ -292,6 +297,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // Stats management functions
+    function getStats() {
+        const defaultStats = {
+            gamesPlayed: 0,
+            gamesWon: 0,
+            totalLevelsReached: 0,
+            topScore: 0
+        };
+        
+        const stats = localStorage.getItem('expandle_stats');
+        return stats ? JSON.parse(stats) : defaultStats;
+    }
+
+    function updateStats(finalLevel, finalScore, isWin) {
+        const stats = getStats();
+        stats.gamesPlayed++;
+        stats.totalLevelsReached += finalLevel;
+        stats.topScore = Math.max(stats.topScore, finalScore);
+        if (isWin) stats.gamesWon++;
+        
+        localStorage.setItem('expandle_stats', JSON.stringify(stats));
+        return stats;
+    }
+
+    function displayStats(stats) {
+        document.getElementById('gamesPlayed').textContent = stats.gamesPlayed;
+        document.getElementById('winRate').textContent = 
+            ((stats.gamesWon / stats.gamesPlayed) * 100).toFixed(1) + '%';
+        document.getElementById('topScore').textContent = stats.topScore;
+        document.getElementById('avgLevel').textContent = 
+            (stats.totalLevelsReached / stats.gamesPlayed).toFixed(2);
+    }
+
     // Add event listeners
     submitButton.addEventListener('click', submitGuess);
     guessInput.addEventListener('keypress', (e) => {
