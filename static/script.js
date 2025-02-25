@@ -175,7 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.game_over) {
                     // Show game over screen
                     gameOverTitle.textContent = 'Congratulations!';
-                    gameOverScore.textContent = `Final Score: ${data.total_score}`;
+                    gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>`;
+                    // Copy progress staircase to modal
+                    const staircase = document.querySelector('.progress-staircase .staircase').cloneNode(true);
+                    const gameOverStaircase = document.getElementById('gameOverStaircase');
+                    gameOverStaircase.innerHTML = '';
+                    gameOverStaircase.appendChild(staircase);
                     gameOverModal.style.display = 'block';
                 } else {
                     showMessage('Correct! Well done!');
@@ -197,7 +202,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (data.game_over) {
                 gameOverTitle.textContent = 'Game Over';
-                gameOverScore.textContent = `Final Score: ${data.total_score}\nThe word was: ${data.word}`;
+                gameOverScore.innerHTML = `Final Score: ${data.total_score}<br><br>The word was: ${data.word}`;
+                // Copy progress staircase to modal
+                const staircase = document.querySelector('.progress-staircase .staircase').cloneNode(true);
+                const gameOverStaircase = document.getElementById('gameOverStaircase');
+                gameOverStaircase.innerHTML = '';
+                gameOverStaircase.appendChild(staircase);
                 gameOverModal.style.display = 'block';
             }
             
