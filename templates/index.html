@@ -3,17 +3,25 @@
 <head>
 	<!-- Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-8WKE726N03"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-8WKE726N03');
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8WKE726N03', {
+            send_page_view: true,
+            cookie_flags: 'SameSite=None;Secure'
+        });
 
-    // Custom event tracking function
-    function trackGameEvent(eventName, params = {}) {
-        gtag('event', eventName, params);
-    }
-</script>
+        // Custom event tracking function
+        function trackGameEvent(eventName, params = {}) {
+            console.log(`Tracking event: ${eventName}`, params);  // Keep console log for debugging
+            gtag('event', eventName, {
+                ...params,
+                event_category: 'game',
+                non_interaction: false
+            });
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Love Wordle? Try Expandle, where words expand from 3 to 8 letters as you progress. A unique twist on daily word games that adds an extra layer of challenge.">
