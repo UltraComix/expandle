@@ -10,11 +10,12 @@ app.secret_key = os.urandom(24)  # Generate a random secret key
 
 # Security headers and HTTPS
 csp = {
-    'default-src': ["'self'", "cdnjs.cloudflare.com", "https://use.fontawesome.com"],
-    'script-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],  # Needed for inline scripts
-    'style-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "https://use.fontawesome.com"],   # Allow loading from cdnjs
-    'img-src': ["'self'", "data:", "https://use.fontawesome.com"],               # Needed for images
-    'font-src': ["'self'", "data:", "cdnjs.cloudflare.com", "https://use.fontawesome.com"],              # Allow loading fonts from cdnjs
+    'default-src': ["'self'", "cdnjs.cloudflare.com", "https://use.fontawesome.com", "https://www.google-analytics.com", "https://www.googletagmanager.com"],
+    'script-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "https://www.google-analytics.com", "https://www.googletagmanager.com"],
+    'style-src': ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "https://use.fontawesome.com"],
+    'img-src': ["'self'", "data:", "https://use.fontawesome.com", "https://www.google-analytics.com"],
+    'font-src': ["'self'", "data:", "cdnjs.cloudflare.com", "https://use.fontawesome.com"],
+    'connect-src': ["'self'", "https://www.google-analytics.com", "https://analytics.google.com"]
 }
 
 Talisman(app,
